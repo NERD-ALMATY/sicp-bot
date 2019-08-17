@@ -148,3 +148,13 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+
+# Certificates
+*.pem
+
+# Mypy
+.mypy_cache/
+
+# Storage
+data/*
+!data/.gitkeep

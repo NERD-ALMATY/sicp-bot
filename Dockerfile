@@ -4,13 +4,11 @@ RUN mkdir /srv/app
 
 COPY . /srv/app
 
-RUN cd /srv/app
+WORKDIR /srv/app
 
 RUN pip install -r requirements.txt
 
-ENV TELE_TOKEN=''
-ENV GITHUB_TOKEN=''
-ENV DIR_PATTERN=''
+EXPOSE 5000
 
-CMD python main.py
+CMD python sicp_bot
 
