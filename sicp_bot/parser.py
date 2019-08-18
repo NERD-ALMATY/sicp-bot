@@ -2,6 +2,9 @@ from dataclasses import dataclass
 
 import re
 
+from sicp_bot.logger import get_logger
+
+logger = get_logger(__name__)
 
 @dataclass
 class ParsePattern:
@@ -16,6 +19,7 @@ def _pattern_validator(dir_pattern: str) -> ParsePattern:
             dir_pattern
         )
     except ValueError as e:
+        logger.exception('Not compatible directory pattern!', exc_info=e)
         raise Exception('Not compatible directory pattern!', e)
 
 

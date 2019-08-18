@@ -7,7 +7,10 @@ from typing import List, Optional
 from github import Github
 from github.Repository import Repository
 
+from sicp_bot.logger import get_logger
+
 _g: Optional[Github] = None
+logger = get_logger(__name__)
 
 
 class Explorer:
@@ -19,8 +22,8 @@ class Explorer:
             self.user_repo: Repository = _g.get_user(user).get_repo(repo_name)
             self.dir_file_desc = FileDesc(name='/', type=FileTypeEnum.DIR, path=[], children=[])
             self.last_commit = self._get_last_commit()
-        except:
-            print("User or repo is not found")
+        except Exception as e:
+            logger.warn(f"Couldn\'t find a repo for cowboy a : {user}/{repo_name}", exc_info=e)
 
     def get_dir_tree(self) -> FileDesc:
         self.dir_file_desc.children = self._traverse(self.dir_file_desc)
@@ -47,7 +50,6 @@ class Explorer:
                 cur_dir.children.extend(self._traverse(cur_dir))
 
                 file_desc_children.append(cur_dir)
-
 
         return file_desc_children
 

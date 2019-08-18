@@ -26,7 +26,7 @@ class Processor:
 
     def get_leaderboard(self) -> List[Cowboy]:
         self._update_cowboys_exercises()
-        return sorted(self.get_cowboys(), key=lambda cowboy: len(cowboy.exercises))
+        return sorted(self.get_cowboys(), key=lambda cowboy: len(cowboy.exercises))[::-1]
 
     def create_cowboy(self, cowboy: Cowboy) -> Optional[str]:
         assert cowboy.username is not None or cowboy.username != ''
@@ -41,7 +41,7 @@ class Processor:
         if prev_cowboy is not None:
             for got_cowboy in self.get_cowboys():
                 if got_cowboy.username == cowboy.username and got_cowboy.model_id != prev_cowboy.model_id:
-                    raise Exception('Cowboy with username: `{}` already exists'.format(cowboy.username))
+                    raise Exception(f'Cowboy with username: `{cowboy.username}` already exists')
             return self._db_man.update(cowboy)
         else:
             return self.create_cowboy(cowboy)

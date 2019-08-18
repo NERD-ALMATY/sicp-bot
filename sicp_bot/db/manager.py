@@ -41,7 +41,7 @@ class DBManager(Generic[ModelTV]):
     def __init__(self, path: str, object_type: Type[ModelTV], create_if_missing=True):
         self._db: pv.DB = pv.DB(path, create_if_missing=create_if_missing)
         self._object_type = object_type
-        self._list_name = 'keys_{0}'.format(self._object_type)
+        self._list_name = f'keys_{self._object_type}'
         self._keys: _KeysType = _KeysType(list_name=self._list_name, db=self._db)
 
     def _is_valid_model(self, model: ModelTV):
