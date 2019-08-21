@@ -11,6 +11,7 @@ from sicp_bot.explorer import get_explorer_cls
 from sicp_bot.logger import get_logger
 from sicp_bot.parser import get_parser
 from sicp_bot.processor import Processor, Deserializer, Serializer
+from sicp_bot.serve import get_flask_app
 from sicp_bot.utils import get_data_folder_path, default_message_texts
 
 logger = get_logger(__name__)
@@ -35,7 +36,7 @@ def authorize(message: Message, func: Callable):
 
 @bot.message_handler(commands=['start', 'help'])
 def start_help(message: Message) -> None:
-    bot.send_message(message.chat.id, default_message_texts['start_text'], parse_mode="Markdown")
+    bot.send_message(message.chat.id, default_message_texts['start_text'], parse_mode='Markdown')
 
 
 @bot.message_handler(commands=['add'])
@@ -64,7 +65,7 @@ def del_cowboy(message: Message) -> None:
             else:
                 bot.send_message(message.chat.id, f'Cowboy with such username is not found: {message.text}')
     except Exception as e:
-        logger.exception("Couldn\'t delete a cowboy.", exc_info=e)
+        logger.exception('Couldn\'t delete a cowboy.', exc_info=e)
         bot.send_message(message.chat.id, f'Couldn\'t delete a cowboy.')
 
 
@@ -73,7 +74,7 @@ def add_cowboy(message: Message) -> None:
         cowboy_id = processor.create_cowboy(deserializer.to_cowboy(message.text))
         bot.send_message(message.chat.id, f'Created a new cowboy with id: {cowboy_id}')
     except Exception as e:
-        logger.exception("Couldn\'t add a cowboy.", exc_info=e)
+        logger.exception('Couldn\'t add a cowboy.', exc_info=e)
         bot.send_message(message.chat.id, f'Couldn\'t add a new cowboy.')
 
 
@@ -83,9 +84,9 @@ def get_cowboy(message: Message):
     cowboy = processor.get_cowboy(username)
     if isinstance(cowboy, Cowboy):
         ans = serializer.from_cowboy_extended(cowboy)
-        bot.send_message(message.chat.id, ans, parse_mode="Markdown")
+        bot.send_message(message.chat.id, ans, parse_mode='Markdown')
     else:
-        bot.send_message(message.chat.id, f"Cowboy is not found: {username}", parse_mode="Markdown")
+        bot.send_message(message.chat.id, f'Cowboy is not found: {username}', parse_mode='Markdown')
 
 
 @bot.message_handler(regexp='\/leaderboard ([1-9][0-9]+|[1-9])')
@@ -93,12 +94,29 @@ def get_cowboy(message: Message):
 def get_leaderboard(message: Message):
     length: int = 10 if len(message.text) <= 13 else int(message.text[13:].strip())
     bot.send_message(message.chat.id, serializer.leaderboard(processor.get_leaderboard()[:length]),
-                     parse_mode="Markdown")
+                     parse_mode='Markdown')
 
 
 @bot.message_handler(func=lambda message: True)
 def repeat_all_messages(message):
-    bot.send_message(message.chat.id, "I don't know how to react!")
+    bot.send_message(message.chat.id, 'I don\'t know how to react!')
 
 
-bot.polling(none_stop=True)
+bot.remove_webhook()
+
+URL_BASE = f'https://{config.HOST}:{config.PORT}'
+URL_PATH = f'/{config.TELE_TOKEN}/'
+
+cert = f'{get_data_folder_path()}/{config.CERT}'
+key = f'{get_data_folder_path()}/{config.KEY}'
+
+if config.DEBUG != '0':
+    bot.polling(none_stop=True)
+else:
+    flask_app = get_flask_app(bot)
+    bot.set_webhook(url=URL_BASE + URL_PATH, certificate=open(cert, 'r'))
+    flask_app.run(
+        host=config.LISTEN,
+        port=config.PORT,
+        ssl_context=(cert, key)
+    )

@@ -2,7 +2,11 @@ from typing import Optional
 
 from telebot import TeleBot
 from flask import Flask, request
-from flask_restful import Resource, Api
+from flask_restful import Resource, Api, abort
+
+from sicp_bot.logger import get_logger
+
+logger = get_logger(__name__)
 
 _app = Flask(__name__)
 _api = Api(_app)
@@ -16,17 +20,18 @@ def _set_bot(bot: TeleBot):
 
 
 class _Main(Resource):
-    content_length = None
-    content_type = None
 
-    def get(self):
+    def post(self):
         json_string = request.get_json()
+        logger.warn(json_string)
         if json_string:
             _bot.process_new_updates([json_string])
-        return '' if json_string is None else json_string
+            return ''
+        else:
+            abort(403, error_message='Knock knock, open up the door, it\'s query! (C) DMX')
 
 
-def get_app(bot: TeleBot):
+def get_flask_app(bot: TeleBot):
     assert isinstance(bot, TeleBot)
     _set_bot(bot)
     _api.add_resource(_Main, f'/{bot.token}')
