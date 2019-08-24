@@ -1,11 +1,13 @@
 version: '3'
 
 services:
-  sicp-bot:
+  app:
     build: .
     env_file:
       - .env
     environment:
-      - PYTHONPATH=/srv/app
+      - PYTHONPATH=/app
+    volumes:
+      - ./data:/app/data
     ports:
-      - ${PORT}:${PORT}
+      - ${PORT}:8443

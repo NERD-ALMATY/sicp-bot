@@ -15,6 +15,7 @@ from sicp_bot.serve import get_flask_app
 from sicp_bot.utils import get_data_folder_path, default_message_texts
 
 logger = get_logger(__name__)
+DEF_PORT = '8443'
 config = Config(**{key: value for (key, value) in env_dict.items() if key in Config.keys()})
 
 parser = get_parser(config.DIR_PATTERN)
@@ -104,7 +105,7 @@ def repeat_all_messages(message):
 
 bot.remove_webhook()
 
-URL_BASE = f'https://{config.HOST}:{config.PORT}'
+URL_BASE = f'https://{config.HOST}:{DEF_PORT}'
 URL_PATH = f'/{config.TELE_TOKEN}/'
 
 cert = f'{get_data_folder_path()}/{config.CERT}'
@@ -117,6 +118,6 @@ else:
     bot.set_webhook(url=URL_BASE + URL_PATH, certificate=open(cert, 'r'))
     flask_app.run(
         host=config.LISTEN,
-        port=config.PORT,
+        port=DEF_PORT,
         ssl_context=(cert, key)
     )

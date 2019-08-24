@@ -14,5 +14,4 @@ class Config(metaclass=Singleton):
 
     @staticmethod
     def keys() -> Set[str]:
-        return {'CERT', 'DEBUG', 'DIR_PATTERN', 'GITHUB_TOKEN', 'HOST', 'ISSUER_ID', 'KEY', 'LISTEN', 'PORT',
-                'TELE_TOKEN'}
+        return {'CERT', 'DEBUG', 'DIR_PATTERN', 'GITHUB_TOKEN', 'HOST', 'ISSUER_ID', 'KEY', 'LISTEN', 'TELE_TOKEN'}

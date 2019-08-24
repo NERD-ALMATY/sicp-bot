@@ -23,7 +23,6 @@ class _Main(Resource):
 
     def post(self):
         json_string = request.get_json()
-        logger.warn(json_string)
         if json_string:
             _bot.process_new_updates([json_string])
             return ''

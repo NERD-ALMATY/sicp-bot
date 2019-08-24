@@ -1,12 +1,14 @@
 FROM python:3.7.4
 
-RUN mkdir /srv/app
+WORKDIR /app
 
-COPY . /srv/app
+COPY sicp_bot sicp_bot
 
-WORKDIR /srv/app
+COPY prod-requirements.txt prod-requirements.txt
 
-RUN pip install -r requirements.txt
+RUN pip install -r prod-requirements.txt
+
+RUN mkdir data
 
 CMD python sicp_bot
 
