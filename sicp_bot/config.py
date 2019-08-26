@@ -10,7 +10,7 @@ class Config(metaclass=Singleton):
     def __init__(self, **kwargs: Dict[str, str]):
         for key in Config.keys():
             setattr(self, key, kwargs[key])
-            logger.warn(f'Set a config key: {key}')
+            logger.info(f'Set a config key: {key}')
 
     @staticmethod
     def keys() -> Set[str]:

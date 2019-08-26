@@ -1,0 +1,25 @@
+http {
+    types_hash_max_size 4096;
+    server_names_hash_bucket_size 128;
+
+    keepalive_timeout  65;
+
+    server {
+ 	    listen         80;
+  		server_name    acme.com;
+  		return         301 https://$server_name$request_uri;
+    }
+
+    server  {
+        listen 443 ssl;
+
+        server_name acme.com;
+
+        ssl_certificate /path/to/your/cert.pem;
+        ssl_certificate_key /path/to/your/key.pem;
+
+        location / {
+            proxy_pass http://localhost:8443;
+        }
+    }
+}

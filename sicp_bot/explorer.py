@@ -23,7 +23,7 @@ class Explorer:
             self.dir_file_desc = FileDesc(name='/', type=FileTypeEnum.DIR, path=[], children=[])
             self.last_commit = self._get_last_commit()
         except Exception as e:
-            logger.warn(f'Couldn\'t find a repo for cowboy a : {user}/{repo_name}', exc_info=e)
+            logger.info(f'Couldn\'t find a repo for cowboy a : {user}/{repo_name}', exc_info=e)
 
     def get_dir_tree(self) -> FileDesc:
         self.dir_file_desc.children = self._traverse(self.dir_file_desc)

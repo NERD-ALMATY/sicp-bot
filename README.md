@@ -14,23 +14,30 @@ This project is intended to build a Telegram bot that can count the number of so
 ### Installation and Execution
 
 * Clone the repo:
-    ```
+    ```shell
     git clone github.com/nerd-iitu/sicp-bot
     ```
 * Copy and set your own `.env` properties:
-    ```
+    ```shell
     cp .env.sample .env
     # vim .env
     ```
 * Generate the needed certificates and set the proper fields:
-    ```
+    ```shell
     cd data
     openssl genrsa -out key.pem 2048
     openssl req -new -x509 -days 3650 -key key.pem -out cert.pem
     cd ..
     ```
-* Launch:
+* Place your own `nginx.conf` file :
+    ```shell
+    cp nginx.conf.sample /path/to/your/nginx.conf
+    vim /path/to/your/nginx.conf
+    nginx -s reload # or it might be docker container, IDK
     ```
+
+* Launch:
+    ```shell
     docker-compose up -d
     ```
 

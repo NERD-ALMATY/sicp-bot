@@ -1,4 +1,3 @@
-from os import environ as env_dict
 from pathlib import Path
 
 from typing import Dict, Any

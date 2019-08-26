@@ -10,4 +10,4 @@ services:
     volumes:
       - ./data:/app/data
     ports:
-      - ${PORT}:8443
+      - 127.0.0.1:${PORT}:8443

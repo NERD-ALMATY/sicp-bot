@@ -105,19 +105,19 @@ def repeat_all_messages(message):
 
 bot.remove_webhook()
 
-URL_BASE = f'https://{config.HOST}:{DEF_PORT}'
-URL_PATH = f'/{config.TELE_TOKEN}/'
+URL_BASE = f'https://{config.HOST}'
+URL_PATH = f'/{config.TELE_TOKEN}'
 
 cert = f'{get_data_folder_path()}/{config.CERT}'
-key = f'{get_data_folder_path()}/{config.KEY}'
 
 if config.DEBUG != '0':
+    logger.info("Running in a DEBUG mode.")
     bot.polling(none_stop=True)
 else:
+    logger.info("Running in a PRODUCTION mode.")
     flask_app = get_flask_app(bot)
-    bot.set_webhook(url=URL_BASE + URL_PATH, certificate=open(cert, 'r'))
+    bot.set_webhook(url=URL_BASE + URL_PATH, certificate=open(cert, 'rb'))
     flask_app.run(
         host=config.LISTEN,
         port=DEF_PORT,
-        ssl_context=(cert, key)
     )
