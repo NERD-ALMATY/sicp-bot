@@ -2,20 +2,20 @@ import logging
 
 from sicp_bot.utils import get_data_folder_path
 
+formatter = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(
+    level=logging.INFO,
+    format=formatter,
+    filename=f'{get_data_folder_path()}/app.log',
+    filemode='w'
+)
+
 stream_handler = logging.StreamHandler()
-file_handler = logging.FileHandler(f'{get_data_folder_path()}/app.log')
-
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
+stream_handler.setFormatter(logging.Formatter(formatter))
 stream_handler.setLevel(logging.INFO)
-file_handler.setLevel(logging.WARNING)
-stream_handler.setFormatter(formatter)
-file_handler.setFormatter(formatter)
 
 
-def get_logger(scope):
+def get_logger(scope) -> logging.Logger:
     logger = logging.getLogger(scope)
-    logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
-
     return logger
