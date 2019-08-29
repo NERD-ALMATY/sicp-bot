@@ -65,7 +65,7 @@ class Processor:
 
     def _update_cowboys_exercises(self):
         for cowboy in self.get_cowboys():
-            explorer = self._explorer_cls(cowboy.name, cowboy.repo)
+            explorer = self._explorer_cls(cowboy.username, cowboy.repo)
             if explorer.dir_file_desc is not None and explorer.last_commit != cowboy.last_commit:
                 self._tree_matcher(cowboy, explorer.get_dir_tree())
                 cowboy.last_commit = explorer.last_commit
