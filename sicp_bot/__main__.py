@@ -27,12 +27,17 @@ bot = TeleBot(config.TELE_TOKEN)
 
 deserializer, serializer = Deserializer(), Serializer()
 
+URL_BASE = f'https://{config.HOST}'
+URL_PATH = f'/{config.TELE_TOKEN}'
 
-def authorize(message: Message, func: Callable):
-    if message.from_user.id == int(config.ISSUER_ID):
-        func()
-    else:
+cert = f'{get_data_folder_path()}/{config.CERT}'
+
+
+def authorized(message: Message) -> bool:
+    if message.from_user.id != int(config.ISSUER_ID):
         bot.send_message(message.chat.id, f'Unauthorized access!')
+        return False
+    return True
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -42,41 +47,45 @@ def start_help(message: Message) -> None:
 
 @bot.message_handler(commands=['add'])
 def pre_add_cowboy(message: Message) -> None:
-    authorize(message, lambda:
-    bot.register_next_step_handler(bot.send_message(message.chat.id, default_message_texts['add_msg_text']),
-                                   add_cowboy))
+    if authorized(message):
+        bot.register_next_step_handler(
+            bot.send_message(message.chat.id, default_message_texts['add_msg_text']),
+            add_cowboy)
 
 
 @bot.message_handler(commands=['del'])
 def pre_del_cowboy(message: Message) -> None:
-    authorize(message, lambda:
-    bot.register_next_step_handler(bot.send_message(message.chat.id, default_message_texts['del_msg_text']),
-                                   del_cowboy))
+    if authorized(message):
+        bot.register_next_step_handler(
+            bot.send_message(message.chat.id, default_message_texts['del_msg_text']),
+            del_cowboy)
 
 
 def del_cowboy(message: Message) -> None:
-    try:
-        cowboy = processor.get_cowboy(message.text)
-        if cowboy is None:
-            bot.send_message(message.chat.id, f'Cowboy with such username is not found: {message.text}')
-        else:
-            cowboy_id = processor.delete_cowboy(message.text)
-            if cowboy_id is not None:
-                bot.send_message(message.chat.id, f'Deleted a cowboy: {cowboy.username}\n with model_id: {cowboy_id}')
-            else:
+    if authorized(message):
+        try:
+            cowboy = processor.get_cowboy(message.text)
+            if cowboy is None:
                 bot.send_message(message.chat.id, f'Cowboy with such username is not found: {message.text}')
-    except Exception as e:
-        logger.exception('Couldn\'t delete a cowboy.', exc_info=e)
-        bot.send_message(message.chat.id, f'Couldn\'t delete a cowboy.')
+            else:
+                cowboy_id = processor.delete_cowboy(message.text)
+                if cowboy_id is not None:
+                    bot.send_message(message.chat.id, f'Deleted a cowboy: {cowboy.username}\n with model_id: {cowboy_id}')
+                else:
+                    bot.send_message(message.chat.id, f'Cowboy with such username is not found: {message.text}')
+        except Exception as e:
+            logger.exception('Couldn\'t delete a cowboy.', exc_info=e)
+            bot.send_message(message.chat.id, f'Couldn\'t delete a cowboy.')
 
 
 def add_cowboy(message: Message) -> None:
-    try:
-        cowboy_id = processor.create_cowboy(deserializer.to_cowboy(message.text))
-        bot.send_message(message.chat.id, f'Created a new cowboy with id: {cowboy_id}')
-    except Exception as e:
-        logger.exception('Couldn\'t add a cowboy.', exc_info=e)
-        bot.send_message(message.chat.id, f'Couldn\'t add a new cowboy.')
+    if authorized(message):
+        try:
+            cowboy_id = processor.create_cowboy(deserializer.to_cowboy(message.text))
+            bot.send_message(message.chat.id, f'Created a new cowboy with id: {cowboy_id}')
+        except Exception as e:
+            logger.exception('Couldn\'t add a cowboy.', exc_info=e)
+            bot.send_message(message.chat.id, f'Couldn\'t add a new cowboy.')
 
 
 @bot.message_handler(regexp='\/get [A-z0-9]*')
@@ -104,11 +113,6 @@ def repeat_all_messages(message):
 
 
 bot.remove_webhook()
-
-URL_BASE = f'https://{config.HOST}'
-URL_PATH = f'/{config.TELE_TOKEN}'
-
-cert = f'{get_data_folder_path()}/{config.CERT}'
 
 if config.DEBUG != '0':
     logger.info("Running in a DEBUG mode.")
