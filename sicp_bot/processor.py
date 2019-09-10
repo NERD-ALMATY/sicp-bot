@@ -1,5 +1,6 @@
 import re
-from copy import copy, deepcopy
+from copy import deepcopy
+from datetime import datetime
 from typing import List, Iterator, Type, Optional
 
 from sicp_bot.db.manager import DBManager
@@ -13,6 +14,9 @@ default_cowboy = Cowboy(
     name='',
     repo='',
     last_commit='',
+    done=0,
+    must_be_done=0,
+    created='',
     exercises=[]
 )
 
@@ -32,6 +36,7 @@ class Processor:
         assert cowboy.username is not None or cowboy.username != ''
         try:
             self._prevent_duplicate(cowboy)
+            cowboy.created = datetime.now().__str__()
             return self._db_man.put(cowboy)
         except AssertionError:
             return None
@@ -69,6 +74,8 @@ class Processor:
             if explorer.dir_file_desc is not None and explorer.last_commit != cowboy.last_commit:
                 self._tree_matcher(cowboy, explorer.get_dir_tree())
                 cowboy.last_commit = explorer.last_commit
+                cowboy.must_be_done = _must_be_done(cowboy.created)
+                cowboy.done = len(cowboy.exercises)
                 self._db_man.update(cowboy)
 
     def _tree_matcher(self, cowboy: Cowboy, user_tree: FileDesc) -> Cowboy:
@@ -109,15 +116,25 @@ class Serializer:
             f'username: {cowboy.username}\n' \
             f'repo: {cowboy.repo}\n' \
             f'last-commit: {cowboy.last_commit[:6]}\n' \
-            f'exercises: \[{self.from_exercises(cowboy.exercises)}]'
+            f'created: {cowboy.created}\n' \
+            f'must: {cowboy.must_be_done}\n' \
+            f'done: {cowboy.done}\n' \
+            f'exercises: \[{self.from_exercises(cowboy.exercises)}\]'
         return cowboy_str
 
-    def from_cowboy(self, cowboy: Cowboy) -> str:
-        return f'{cowboy.name}: {len(cowboy.exercises)}\n' \
+    @staticmethod
+    def from_cowboy(cowboy: Cowboy) -> str:
+        return f'{cowboy.name}: {cowboy.done}/{cowboy.must_be_done}\n' \
             f'github-repo: [link](https://github.com/{cowboy.username}/{cowboy.repo})'
 
-    def leaderboard(self, cowboys: List[Cowboy]) -> str:
-        return '\n\n'.join([self.from_cowboy(cowboy) for cowboy in cowboys])
+    @staticmethod
+    def leaderboard(cowboys: List[Cowboy]) -> str:
+        return '\n\n'.join([Serializer.from_cowboy(cowboy) for cowboy in cowboys])
+
+
+def _must_be_done(datetime_str: str):
+    must_be_done = (datetime.now() - datetime.fromisoformat(datetime_str)).seconds / (7 * 24 * 60) * 5
+    return 356 if must_be_done >= 356 else int(must_be_done)
 
 
 class Deserializer:
