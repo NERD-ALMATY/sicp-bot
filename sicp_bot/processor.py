@@ -133,7 +133,7 @@ class Serializer:
 
 
 def _must_be_done(datetime_str: str):
-    must_be_done = (datetime.now() - datetime.fromisoformat(datetime_str)).seconds / (7 * 24 * 60) * 5
+    must_be_done = (datetime.now() - datetime.fromisoformat(datetime_str)).days / 7 * 5
     return 356 if must_be_done >= 356 else int(must_be_done)
 
 
