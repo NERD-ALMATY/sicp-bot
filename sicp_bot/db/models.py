@@ -14,3 +14,4 @@ class Cowboy(BaseModel):
     repo: str
     last_commit: str
     exercises: List[Exercise]
+    created: str

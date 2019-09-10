@@ -1,5 +1,6 @@
 import re
-from copy import copy, deepcopy
+from copy import deepcopy
+from datetime import datetime
 from typing import List, Iterator, Type, Optional
 
 from sicp_bot.db.manager import DBManager
@@ -32,6 +33,7 @@ class Processor:
         assert cowboy.username is not None or cowboy.username != ''
         try:
             self._prevent_duplicate(cowboy)
+            cowboy.created = datetime.now().__str__()
             return self._db_man.put(cowboy)
         except AssertionError:
             return None
@@ -109,15 +111,25 @@ class Serializer:
             f'username: {cowboy.username}\n' \
             f'repo: {cowboy.repo}\n' \
             f'last-commit: {cowboy.last_commit[:6]}\n' \
-            f'exercises: \[{self.from_exercises(cowboy.exercises)}]'
+            f'created: \[{cowboy.created}]' \
+            f'must: {self._must_be_done(cowboy.created)}' \
+            f'done: {len(cowboy.exercises)}' \
+            f'exercises: [{self.from_exercises(cowboy.exercises)}]'
         return cowboy_str
 
-    def from_cowboy(self, cowboy: Cowboy) -> str:
+    @staticmethod
+    def from_cowboy(cowboy: Cowboy) -> str:
         return f'{cowboy.name}: {len(cowboy.exercises)}\n' \
             f'github-repo: [link](https://github.com/{cowboy.username}/{cowboy.repo})'
 
-    def leaderboard(self, cowboys: List[Cowboy]) -> str:
-        return '\n\n'.join([self.from_cowboy(cowboy) for cowboy in cowboys])
+    @staticmethod
+    def leaderboard(cowboys: List[Cowboy]) -> str:
+        return '\n\n'.join([Serializer.from_cowboy(cowboy) for cowboy in cowboys])
+
+    @staticmethod
+    def _must_be_done(datetime_str: str):
+        must_be_done = (datetime.now() - datetime.fromisoformat(datetime_str)).seconds/(7*24*60*60)*5
+        return 356 if must_be_done >= 356 else int(must_be_done)
 
 
 class Deserializer:
