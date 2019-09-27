@@ -1,13 +1,13 @@
 import logging
 
-from sicp_bot.utils import get_data_folder_path
+from .utils import get_data_folder_path
 
-formatter = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+formatter = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 logging.basicConfig(
     level=logging.INFO,
     format=formatter,
-    filename=f'{get_data_folder_path()}/app.log',
-    filemode='w'
+    filename=f"{get_data_folder_path()}/app.log",
+    filemode="w",
 )
 
 stream_handler = logging.StreamHandler()
