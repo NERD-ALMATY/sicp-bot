@@ -1,15 +1,11 @@
 from pathlib import Path
 
-from typing import Dict, Any
-
-_data_path = f"{Path(__file__).parent.parent}/{'data'}/"
-
 
 def get_data_folder_path() -> str:
-    return _data_path
+    return f"{Path(__file__).parent.parent}/{'data'}/"
 
 
-default_message_texts = {
+default_message_texts = {  # noqa
     "start_text": """ Hey, cowboy! Happy to see ya!
 This bot was created in order to involve people in solving SICP exercises with fun. 
 
@@ -36,12 +32,3 @@ repo: sicp-ans
 arpanetus
 """,
 }
-
-
-# class Singleton(type):
-#     _instances: Dict[Any, Any] = {}
-#
-#     def __call__(cls, *args, **kwargs):
-#         if cls not in cls._instances:
-#             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-#         return cls._instances[cls]

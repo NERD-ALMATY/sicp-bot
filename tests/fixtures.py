@@ -2,6 +2,7 @@ from typing import Dict, List
 
 import pytest
 
+from sicp_bot.parser import ParsePattern
 from sicp_bot.db.models import Exercise, Cowboy
 from tests.factories import ExerciseFactory
 
@@ -45,3 +46,8 @@ def cowboy(exercises) -> Cowboy:
         exercises=exercises,
         created="created",
     )
+
+
+@pytest.fixture()
+def parse_pattern() -> ParsePattern:
+    return ParsePattern("(?s).*")
