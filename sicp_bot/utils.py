@@ -10,7 +10,7 @@ def get_data_folder_path() -> str:
 
 
 default_message_texts = {
-    'start_text': """ Hey, cowboy! Happy to see ya!
+    "start_text": """ Hey, cowboy! Happy to see ya!
 This bot was created in order to involve people in solving SICP exercises with fun. 
 
 Here are the commands you can run:
@@ -27,24 +27,21 @@ Hope you're going to enjoy using it!
 maintainer: @arpanetus
 repository: [github.com/nerd-iitu/sicp-bot](https://github.com/nerd-iitu/sicp-bot)
 """,
-
-    'add_msg_text': """Here's the syntax to add:
+    "add_msg_text": """Here's the syntax to add:
 username: arpanetus
 name: arpanetus
 repo: sicp-ans
 """,
-
-    'del_msg_text': """Simply place the username:
+    "del_msg_text": """Simply place the username:
 arpanetus
-"""
+""",
 }
 
 
-class Singleton(type):
-    _instances: Dict[Any, Any] = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = \
-                super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+# class Singleton(type):
+#     _instances: Dict[Any, Any] = {}
+#
+#     def __call__(cls, *args, **kwargs):
+#         if cls not in cls._instances:
+#             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+#         return cls._instances[cls]

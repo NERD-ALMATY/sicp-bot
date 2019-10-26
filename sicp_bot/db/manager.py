@@ -1,24 +1,22 @@
 from __future__ import annotations
 
-from typing import List, Iterator, Optional, Type, TypeVar, Union, Generic
+from typing import List, Iterator, Optional, Type, TypeVar, Generic
 import uuid
 import plyvel as pv
 import jsons
-from sicp_bot.db import BaseModel
+from ..db import BaseModel
 
 
 class _KeysType(List[str]):
-
     def __init__(self, list_name: str, db: pv.DB):
         assert list_name is not None and isinstance(db, pv.DB)
         self._list_name = list_name.encode()
         self._db = db
-        self._setup()
-
-    def _setup(self):
         keys: bytes = self._db.get(self._list_name)
         if keys is not None:
             super().__init__(list(jsons.loadb(keys)))
+        else:
+            super().__init__()
 
     def _rewrite_db(self):
         self._db.put(self._list_name, jsons.dumpb(self))
@@ -34,15 +32,19 @@ class _KeysType(List[str]):
             self._rewrite_db()
 
 
-ModelTV = TypeVar('ModelTV', bound=BaseModel)
+ModelTV = TypeVar("ModelTV", bound=BaseModel)
 
 
 class DBManager(Generic[ModelTV]):
-    def __init__(self, path: str, object_type: Type[ModelTV], create_if_missing=True):
+    def __init__(
+        self, path: str, object_type: Type[ModelTV], create_if_missing=True
+    ):
         self._db: pv.DB = pv.DB(path, create_if_missing=create_if_missing)
         self._object_type = object_type
-        self._list_name = f'keys_{self._object_type}'
-        self._keys: _KeysType = _KeysType(list_name=self._list_name, db=self._db)
+        self._list_name = f"keys_{self._object_type}"
+        self._keys: _KeysType = _KeysType(
+            list_name=self._list_name, db=self._db
+        )
 
     def _is_valid_model(self, model: ModelTV):
         assert isinstance(model, self._object_type)
@@ -73,7 +75,9 @@ class DBManager(Generic[ModelTV]):
             yield key
 
     def get_models(self) -> Iterator[Optional[ModelTV]]:
-        for model in map(lambda model_id: self.get(model_id), self.get_model_ids()):
+        for model in map(
+            lambda model_id: self.get(model_id), self.get_model_ids()
+        ):
             yield model
 
     def _decode(self, byte_object: bytes) -> ModelTV:
