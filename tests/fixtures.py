@@ -2,7 +2,7 @@ from typing import Dict, List
 
 import pytest
 
-from db.models import Exercise, Cowboy
+from sicp_bot.db.models import Exercise, Cowboy
 from tests.factories import ExerciseFactory
 
 
@@ -33,5 +33,15 @@ def exercises() -> List[Exercise]:
 
 
 @pytest.fixture()
-def cowboy(exercises: List[Exercise]) -> Cowboy:
-    pass
+def cowboy(exercises) -> Cowboy:
+    return Cowboy(
+        model_id="id",
+        name="name",
+        username="username",
+        repo="repo",
+        last_commit="last_commit",
+        must_be_done=0,
+        done=0,
+        exercises=exercises,
+        created="created",
+    )
