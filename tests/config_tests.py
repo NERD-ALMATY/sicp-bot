@@ -11,5 +11,6 @@ def test_config(mock_config_dict: Dict[str, str]):
             if key in config_fields
         }
     )
+
     for field in config_fields:
         assert getattr(config, field) == mock_config_dict[field]
