@@ -11,3 +11,16 @@ services:
       - ./data:/app/data
     ports:
       - 127.0.0.1:${PORT}:8443
+
+nginx:
+  image: :latest
+  hostname: nginx
+  links:
+    - web:web
+  ports:
+    - "80:80"
+  environment:
+    - BACKEND=web
+    - PORT=80
+    - USERNAME=user
+    - PASSWORD=pass
